@@ -1,6 +1,16 @@
 ---
 # defaults file for skynetlabs.skynet_webportal
 
+# Default Skynet Webportal git repository URL
+skynet_webportal_repo_url: "https://github.com/NebulousLabs/skynet-webportal.git"
+
+# Default Skynet Webportal git branch/commit/tag
+skynet_webportal_version: "master"
+
+# Local git checkouts
+temp_skynetlabs_git: "/tmp/SkynetLabs/ansible/git"
+temp_skynetlabs_git_webportal: "{{ temp_skynetlabs_git }}/skynet-webportal"
+
 # Default hosts .env files storage. Only 'webportal_host_env_content' is used
 # in the role, so instead of storing .env files in a sibling directory/private
 # repository you can override 'webportal_host_env_content' with lookup in your

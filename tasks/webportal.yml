@@ -17,32 +17,32 @@
     group: "{{ webportal_user }}"
     mode: '0600'
 
+- name: Checkout skynet-webportal repo
+  local_action:
+    repo: "{{ skynet_webportal_repo_url }}"
+    dest: "{{ temp_skynetlabs_git }}"
+    version: "{{ skynet_webportal_version }}"
+  run_once: true
+
 - name: Copy docker-compose.yml file
   copy:
-    # xxx use docker-compose.yml from webportal repo
-    src: "../../docker-compose.yml"
+    src: "{{ temp_skynetlabs_git_webportal }}/docker-compose.yml"
     dest: "{{ webportal_dir }}"
     owner: "{{ webportal_user }}"
     group: "{{ webportal_user }}"
     mode: '0600'
 
-- name: Sync docker directory
+- name: Sync docker and packages directories
   ansible.posix.synchronize:
-    src: ../../docker
+    src: "{{ temp_skynetlabs_git_webportal }}/{{ item }}"
     dest: "{{ webportal_dir }}"
     owner: no
     group: no
     delete: yes
     recursive: yes
-
-- name: Sync packages directory
-  ansible.posix.synchronize:
-    src: ../../packages
-    dest: "{{ webportal_dir }}"
-    owner: no
-    group: no
-    delete: yes
-    recursive: yes
+  loop:
+    - docker
+    - packages
 
 - name: Tighten file permissions
   file:
