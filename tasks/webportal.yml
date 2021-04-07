@@ -19,10 +19,12 @@
 
 - name: Checkout skynet-webportal repo
   local_action:
+    module: ansible.builtin.git
     repo: "{{ skynet_webportal_repo_url }}"
-    dest: "{{ temp_skynetlabs_git }}"
+    dest: "{{ temp_skynetlabs_git_webportal }}"
     version: "{{ skynet_webportal_version }}"
   run_once: true
+  become: false
 
 - name: Copy docker-compose.yml file
   copy:
