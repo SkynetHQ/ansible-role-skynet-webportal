@@ -1,0 +1,33 @@
+---
+# defaults file for skynetlabs.skynet_webportal
+
+# Default hosts .env files storage. Only 'webportal_host_env_content' is used
+# in the role, so instead of storing .env files in a sibling directory/private
+# repository you can override 'webportal_host_env_content' with lookup in your
+# passwords/secrets manager like HashiCorp Vault or LastPass.
+# webportal_private_secrets_dir is relative to ./files/
+webportal_private_secrets_dir: "../../ansible-private"
+webportal_host_env_filepath: "{{ webportal_private_secrets_dir }}/env-files/.env-{{ inventory_hostname }}"
+webportal_host_env_content: "{{lookup('file', webportal_host_env_filepath) }}"
+
+# List of possible local SSH keys. First found key will be copied to the host.
+local_ssh_pubkeys:
+  - "id_ed25519.pub"
+  - "id_rsa.pub"
+
+# Webportal os user
+webportal_user: "user"
+
+# Webportal directory
+webportal_dir: "/home/{{ webportal_user }}/skynet-webportal"
+
+# Webportal server firewall
+webportal_server_set_firewall: false
+
+# Timezone settings: Whether to set timezone and timezone value
+webportal_server_set_timezone: false
+webportal_server_timezone: "UTC"
+
+# Set file limits. siad stores a lot of files so we need to adjust so the
+# server doesn't choke up
+webportal_user_filelimits: 25000

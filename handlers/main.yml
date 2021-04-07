@@ -1,0 +1,7 @@
+---
+# handlers file for skynetlabs.skynet_webportal
+
+- name: reload ufw firewall
+  community.general.ufw:
+    state: reloaded
+  become: yes

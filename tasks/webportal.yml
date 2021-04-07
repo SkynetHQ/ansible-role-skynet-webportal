@@ -1,0 +1,80 @@
+---
+# Setup Skynet webportal
+
+- name: Create webportal directory
+  ansible.builtin.file:
+    path: "{{ webportal_dir }}"
+    state: directory
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
+    mode: '0700'
+
+- name: Copy webportal .env file
+  copy:
+    content: "{{ webportal_host_env_content }}"
+    dest: "{{ webportal_dir }}/.env"
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
+    mode: '0600'
+
+- name: Copy docker-compose.yml file
+  copy:
+    # xxx use docker-compose.yml from webportal repo
+    src: "../../docker-compose.yml"
+    dest: "{{ webportal_dir }}"
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
+    mode: '0600'
+
+- name: Sync docker directory
+  ansible.posix.synchronize:
+    src: ../../docker
+    dest: "{{ webportal_dir }}"
+    owner: no
+    group: no
+    delete: yes
+    recursive: yes
+
+- name: Sync packages directory
+  ansible.posix.synchronize:
+    src: ../../packages
+    dest: "{{ webportal_dir }}"
+    owner: no
+    group: no
+    delete: yes
+    recursive: yes
+
+- name: Tighten file permissions
+  file:
+    dest: "{{ webportal_dir }}"
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
+    mode: u=rwX,g=,o=
+    recurse: yes
+
+- name: Fix for v1.5.5 siac, siad instead of skyc, skyd
+  ansible.builtin.lineinfile:
+    path: "{{ webportal_dir }}/docker/sia/Dockerfile"
+    regexp: '^COPY .* /usr/bin/{{ item.binary }}$'
+    line: "COPY --from=sia-builder /go/bin/{{ item.pattern }} /usr/bin/{{ item.binary }}"
+  loop:
+    - { binary: "siac", pattern: "s??c"}
+    - { binary: "siad", pattern: "s??d"}
+
+- name: Restart docker-compose
+  block:
+
+    - name: Stop docker-compose
+      community.docker.docker_compose:
+        project_src: "{{ webportal_dir }}"
+        state: absent
+
+    # xxx check all flags
+    - name: Run `docker-compose up`
+      community.docker.docker_compose:
+        project_src: "{{ webportal_dir }}"
+        build: yes
+      register: output
+
+  become: true
+  become_user: "{{ webportal_user }}"

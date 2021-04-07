@@ -1,0 +1,34 @@
+---
+# Configure user settings
+
+- name: Add skynet portal user
+  ansible.builtin.user:
+    name: "{{ webportal_user }}"
+    groups:
+      - sudo
+      - docker
+    # xxx need to create home?
+    # xxx disable ssh password auth
+    # xxx check user home permissions
+
+# Copy the first found SSH key from the list of local_ssh_pubkeys
+- name: Set SSH authorized key for webportal user copying it from current local user
+  ansible.posix.authorized_key:
+    user: "{{ webportal_user }}"
+    state: present
+    key: "{{ lookup('file', lookup('first_found', possible_ssh_keys)) }}"
+  vars:
+    possible_ssh_keys:
+      files: "{{ local_ssh_pubkeys }}"
+      paths:
+        - "{{ lookup('env','HOME') + '/.ssh' }}"
+
+
+# Set file limits. siad stores a lot of files so we need to adjust so server
+# doesn't choke up
+- name: Set filelimits
+  ansible.builtin.lineinfile:
+    path: /etc/security/limits.conf
+    regexp: '^user.*nofile'
+    line: 'user             soft    nofile          {{ webportal_user_filelimits }}'
+    insertbefore: '^# End of file'
