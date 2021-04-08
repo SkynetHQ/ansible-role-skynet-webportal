@@ -117,6 +117,7 @@
       community.docker.docker_container:
         name: mongo
         state: absent
+        container_default_behavior: no_defaults
   
   when: mongo_db_dir.stat.exists == false
 
