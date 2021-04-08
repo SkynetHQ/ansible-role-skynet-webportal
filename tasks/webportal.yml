@@ -88,6 +88,8 @@
         command: --keyFile=/data/mgkey --replSet=skynet
         state: present
         recreate: yes
+        container_default_behavior: no_defaults
+        auto_remove: true
         env:
           MONGO_INITDB_ROOT_USERNAME: "{{ webportal_mongo_init_username }}"
           MONGO_INITDB_ROOT_PASSWORD: "{{ webportal_mongo_init_password }}}"
@@ -111,12 +113,6 @@
     
     - name: Force a failure after recovery
       ansible.builtin.command: /bin/false
-  
-  always:
-    - name: Remove temporary MongoDB initialization container
-      community.docker.docker_container:
-        name: mongo
-        state: absent
   
   when: mongo_db_dir.stat.exists == false
 
