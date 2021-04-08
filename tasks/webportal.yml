@@ -103,13 +103,20 @@
     
   # Remove mongo/db if the block fails, so the block can execute on next run
   rescue:
+
     - name: Remove mongo/db directory on initialization failure
       ansible.builtin.file:
         path: "{{ webportal_docker_data_mongo_dir }}/db"
         state: absent
-
+    
     - name: Force a failure after recovery
       ansible.builtin.command: /bin/false
+  
+  always:
+    - name: Remove temporary MongoDB initialization container
+      community.docker.docker_container:
+        name: mongo
+        state: absent
   
   when: mongo_db_dir.stat.exists == false
 
