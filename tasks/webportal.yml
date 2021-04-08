@@ -97,6 +97,10 @@
           - "{{ webportal_docker_data_mongo_dir }}/db:/data/db"
           - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
     
+    #xxx test failure, then remove
+    - name: Force a failure during recovery
+      ansible.builtin.command: /bin/false
+    
   # Remove mongo/db if the block fails, so the block can execute on next run
   rescue:
     - name: Remove mongo/db directory on initialization failure
@@ -104,10 +108,10 @@
         path: "{{ webportal_docker_data_mongo_dir }}/db"
         state: absent
 
-    - name: Force a failure during recovery
+    - name: Force a failure after recovery
       ansible.builtin.command: /bin/false
   
-  when: mongo_db_dir.stat.exist == false
+  when: mongo_db_dir.stat.exists == false
 
 - name: Restart docker-compose
   block:
