@@ -63,6 +63,52 @@
     - { binary: "siac", pattern: "s??c"}
     - { binary: "siad", pattern: "s??d"}
 
+- name: Check if MongoDB was initialized
+  stat:
+    path: "{{ webportal_docker_data_mongo_dir }}/db"
+  register: mongo_db_dir
+
+- name: Initialize MongoDB once
+  block:
+
+    - name: Create MongoDB data directory
+      file:
+        path: "{{ webportal_docker_data_mongo_dir }}"
+        state: directory
+
+    - name: Upload MongoDB keyfile
+      copy:
+        content: "{{ webportal_mongo_mgkey_content }}"
+        dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
+    
+    - name: Initialize MongoDB with admin username and password
+      community.docker.docker_container:
+        name: mongo
+        image: mongo:4.4.1
+        command: --keyFile=/data/mgkey --replSet=skynet
+        state: present
+        recreate: yes
+        env:
+          MONGO_INITDB_ROOT_USERNAME: "{{ webportal_mongo_init_username }}"
+          MONGO_INITDB_ROOT_PASSWORD: "{{ webportal_mongo_init_password }}}"
+        exposed_ports:
+          - 27017:27017
+        volumes:
+          - "{{ webportal_docker_data_mongo_dir }}/db:/data/db"
+          - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
+    
+  # Remove mongo/db if the block fails, so the block can execute on next run
+  rescue:
+    - name: Remove mongo/db directory on initialization failure
+      ansible.builtin.file:
+        path: "{{ webportal_docker_data_mongo_dir }}/db"
+        state: absent
+
+    - name: Force a failure during recovery
+      ansible.builtin.command: /bin/false
+  
+  when: mongo_db_dir.stat.exist == false
+
 - name: Restart docker-compose
   block:
 

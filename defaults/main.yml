@@ -12,9 +12,8 @@ temp_skynetlabs_git: "/tmp/SkynetLabs/ansible/git"
 temp_skynetlabs_git_webportal: "{{ temp_skynetlabs_git }}/skynet-webportal"
 
 # Default hosts .env files storage. Only 'webportal_host_env_content' is used
-# in the role, so instead of storing .env files in a sibling directory/private
 # repository you can override 'webportal_host_env_content' with lookup in your
-# passwords/secrets manager like HashiCorp Vault or LastPass.
+# passwords/secrets manager like Ansible Vault, HashiCorp Vault or LastPass.
 # webportal_private_secrets_dir is relative to ./files/
 webportal_private_secrets_dir: "../../ansible-private"
 webportal_host_env_filepath: "{{ webportal_private_secrets_dir }}/env-files/.env-{{ inventory_hostname }}"
@@ -41,3 +40,12 @@ webportal_server_timezone: "UTC"
 # Set file limits. siad stores a lot of files so we need to adjust so the
 # server doesn't choke up
 webportal_user_filelimits: 25000
+
+# MongoDB settings. 'webportal_mongo_cfg_filepath' is not used anywhere in the
+# role, you just need to set webportal_mongo_init_username and
+# webportal_mongo_init_password, e.g. with lookup in your
+# passwords/secrets manager like Ansible Vault, HashiCorp Vault or LastPass.
+webportal_mongo_mgkey_content: "{{ lookup('file',  '{{ webportal_private_secrets_dir }}/cfg-files/mgkey-fil') }}"
+webportal_mongo_cfg_filepath: "{{ webportal_private_secrets_dir }}/cfg-files/mongodb-admin"
+webportal_mongo_init_username: "{{ lookup('ini', 'MONGO_INITDB_ROOT_USERNAME type=properties file={{ webportal_mongo_cfg_filepath }}') }}"
+webportal_mongo_init_password: "{{ lookup('ini', 'MONGO_INITDB_ROOT_PASSWORD type=properties file={{ webportal_mongo_cfg_filepath }}') }}"
