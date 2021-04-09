@@ -49,3 +49,5 @@ webportal_mongo_mgkey_content: "{{ lookup('file',  '{{ webportal_private_secrets
 webportal_mongo_cfg_filepath: "{{ webportal_private_secrets_dir }}/cfg-files/mongodb-admin"
 webportal_mongo_init_username: "{{ lookup('ini', 'MONGO_INITDB_ROOT_USERNAME type=properties file={{ webportal_mongo_cfg_filepath }}') }}"
 webportal_mongo_init_password: "{{ lookup('ini', 'MONGO_INITDB_ROOT_PASSWORD type=properties file={{ webportal_mongo_cfg_filepath }}') }}"
+
+# xxx mongo replSet

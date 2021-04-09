@@ -33,3 +33,9 @@
     file: mongo.yml
     apply:
       become: true
+
+- name: Start Skynet webportal by docker compose
+  include_tasks:
+    file: docker-up.yml
+    apply:
+      become: true

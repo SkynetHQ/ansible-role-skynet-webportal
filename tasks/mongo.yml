@@ -12,7 +12,6 @@
   copy:
     content: "{{ webportal_mongo_mgkey_content }}"
     dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
-    owner: "{{ webportal_user }}"
     group: "{{ webportal_user }}"
     mode: '0400'
 
@@ -32,7 +31,8 @@
         state: present
         recreate: yes
         container_default_behavior: no_defaults
-        auto_remove: true
+        #xxx
+        #auto_remove: true
         env:
           MONGO_INITDB_ROOT_USERNAME: "{{ webportal_mongo_init_username }}"
           MONGO_INITDB_ROOT_PASSWORD: "{{ webportal_mongo_init_password }}}"
@@ -61,5 +61,14 @@
         name: mongo
         state: absent
         container_default_behavior: no_defaults
+    
+    - name: Check if MongoDB was initialized (mongo/db was created)
+      stat:
+        path: "{{ webportal_docker_data_mongo_dir }}/db"
+      register: mongo_db_dir
+    
+    - name: Fail if MongoDB initialization failed (mongo/db was not created)
+      ansible.builtin.command: /bin/false
+      when: mongo_db_dir.stat.exists == false
   
   when: mongo_db_dir.stat.exists == false
