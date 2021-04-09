@@ -7,9 +7,7 @@
     groups:
       - sudo
       - docker
-    # xxx need to create home?
-    # xxx disable ssh password auth
-    # xxx check user home permissions
+    # xxx disable ssh password auth?
 
 # Copy the first found SSH key from the list of local_ssh_pubkeys
 - name: Set SSH authorized key for webportal user copying it from current local user

@@ -1,0 +1,65 @@
+---
+# Setup MongoDB
+
+- name: Create MongoDB data directory
+  file:
+    path: "{{ webportal_docker_data_mongo_dir }}"
+    state: directory
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
+
+- name: Upload MongoDB keyfile
+  copy:
+    content: "{{ webportal_mongo_mgkey_content }}"
+    dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
+    mode: '0400'
+
+- name: Check if MongoDB was initialized
+  stat:
+    path: "{{ webportal_docker_data_mongo_dir }}/db"
+  register: mongo_db_dir
+
+- name: Initialize MongoDB once
+  block:
+
+    - name: Initialize MongoDB with admin username and password
+      community.docker.docker_container:
+        name: mongo
+        image: mongo:4.4.1
+        command: --keyFile=/data/mgkey --replSet=skynet
+        state: present
+        recreate: yes
+        container_default_behavior: no_defaults
+        auto_remove: true
+        env:
+          MONGO_INITDB_ROOT_USERNAME: "{{ webportal_mongo_init_username }}"
+          MONGO_INITDB_ROOT_PASSWORD: "{{ webportal_mongo_init_password }}}"
+        exposed_ports:
+          - 27017:27017
+        volumes:
+          - "{{ webportal_docker_data_mongo_dir }}/db:/data/db"
+          - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
+    
+  # Remove mongo/db directory if the initialization fails, so the block can
+  # execute on next run
+  rescue:
+
+    - name: Remove mongo/db directory on initialization failure
+      ansible.builtin.file:
+        path: "{{ webportal_docker_data_mongo_dir }}/db"
+        state: absent
+    
+    - name: Force a failure after recovery
+      ansible.builtin.command: /bin/false
+  
+  always:
+
+    - name: Remove MongoDB initialization container
+      community.docker.docker_container:
+        name: mongo
+        state: absent
+        container_default_behavior: no_defaults
+  
+  when: mongo_db_dir.stat.exists == false

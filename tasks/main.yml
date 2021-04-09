@@ -27,3 +27,9 @@
     file: webportal.yml
     apply:
       become: true
+
+- name: Setup MongoDB
+  include_tasks:
+    file: mongo.yml
+    apply:
+      become: true
