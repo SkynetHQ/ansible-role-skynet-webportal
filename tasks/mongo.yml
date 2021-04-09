@@ -12,15 +12,17 @@
   copy:
     content: "{{ webportal_mongo_mgkey_content }}"
     dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
+    owner: "{{ webportal_user }}"
+    group: "{{ webportal_user }}"
     mode: '0400'
 
 - name: Fix MongoDB keyfile permissions
   community.docker.docker_container:
     name: mongo-fix-perms
     image: mongo:4.4.1
-    state: present
-    container_default_behavior: no_defaults
+    state: started
     auto_remove: true
+    container_default_behavior: no_defaults
     volumes:
       - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
     command: chown mongodb:mongodb /data/mgkey
@@ -38,11 +40,9 @@
         name: mongo
         image: mongo:4.4.1
         command: --keyFile=/data/mgkey --replSet=skynet
-        state: present
+        state: started
         recreate: yes
         container_default_behavior: no_defaults
-        #xxx
-        #auto_remove: true
         env:
           MONGO_INITDB_ROOT_USERNAME: "{{ webportal_mongo_init_username }}"
           MONGO_INITDB_ROOT_PASSWORD: "{{ webportal_mongo_init_password }}}"
