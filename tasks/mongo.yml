@@ -12,8 +12,18 @@
   copy:
     content: "{{ webportal_mongo_mgkey_content }}"
     dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
-    group: "{{ webportal_user }}"
     mode: '0400'
+
+- name: Fix MongoDB keyfile permissions
+  community.docker.docker_container:
+    name: mongo-fix-perms
+    image: mongo:4.4.1
+    state: present
+    container_default_behavior: no_defaults
+    auto_remove: true
+    volumes:
+      - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
+    command: chown mongodb:mongodb /data/mgkey
 
 - name: Check if MongoDB was initialized
   stat:
