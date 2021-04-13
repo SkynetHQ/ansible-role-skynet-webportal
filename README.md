@@ -1,3 +1,15 @@
+This role was work-in-progress and it is currently archived.
+
+The role was able to start to setup Skynet Webportal at the git commit
+`7ec5e5106fd3` (without paid accounts).
+
+In the current status the role is able to configure MongoDB keyfile, but it is
+not able to update MOngoDB keyfile on the next executions if the keyfile is
+updated.
+
+MongoDB initialization must be in sync with docker-compose.yml if the MongoDB
+docker-compose configuration changes later.
+
 Role Name
 =========
 

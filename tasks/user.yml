@@ -7,7 +7,6 @@
     groups:
       - sudo
       - docker
-    # xxx disable ssh password auth?
 
 # Copy the first found SSH key from the list of local_ssh_pubkeys
 - name: Set SSH authorized key for webportal user copying it from current local user

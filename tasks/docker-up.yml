@@ -9,7 +9,6 @@
         project_src: "{{ webportal_dir }}"
         state: absent
 
-    # xxx check all flags
     - name: Run `docker-compose up`
       community.docker.docker_compose:
         project_src: "{{ webportal_dir }}"

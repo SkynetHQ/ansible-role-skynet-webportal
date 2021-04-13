@@ -8,24 +8,34 @@
     owner: "{{ webportal_user }}"
     group: "{{ webportal_user }}"
 
-- name: Upload MongoDB keyfile
-  copy:
-    content: "{{ webportal_mongo_mgkey_content }}"
-    dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
-    owner: "{{ webportal_user }}"
-    group: "{{ webportal_user }}"
-    mode: '0400'
+- name: Check if MongoDB keyfile is present
+  stat:
+    path: "{{ webportal_docker_data_mongo_dir }}/mgkey"
+  register: mongo_db_mgkey
 
-- name: Fix MongoDB keyfile permissions
-  community.docker.docker_container:
-    name: mongo-fix-perms
-    image: mongo:4.4.1
-    state: started
-    auto_remove: true
-    container_default_behavior: no_defaults
-    volumes:
-      - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
-    command: chown mongodb:mongodb /data/mgkey
+- name: Upload and set permissions to MongoDB keyfile
+  block:
+
+    - name: Upload MongoDB keyfile
+      copy:
+        content: "{{ webportal_mongo_mgkey_content }}"
+        dest: "{{ webportal_docker_data_mongo_dir }}/mgkey"
+        owner: "{{ webportal_user }}"
+        group: "{{ webportal_user }}"
+        mode: '0400'
+
+    - name: Fix MongoDB keyfile permissions
+      community.docker.docker_container:
+        name: mongo-fix-perms
+        image: mongo:4.4.1
+        state: started
+        auto_remove: true
+        container_default_behavior: no_defaults
+        volumes:
+          - "{{ webportal_docker_data_mongo_dir }}/mgkey:/data/mgkey"
+        command: chown mongodb:mongodb /data/mgkey
+  
+  when: mongo_db_mgkey.stat.exists == false
 
 - name: Check if MongoDB was initialized
   stat:
@@ -75,10 +85,10 @@
     - name: Check if MongoDB was initialized (mongo/db was created)
       stat:
         path: "{{ webportal_docker_data_mongo_dir }}/db"
-      register: mongo_db_dir
+      register: mongo_db_dir_after
     
     - name: Fail if MongoDB initialization failed (mongo/db was not created)
       ansible.builtin.command: /bin/false
-      when: mongo_db_dir.stat.exists == false
+      when: mongo_db_dir_after.stat.exists == false
   
   when: mongo_db_dir.stat.exists == false
