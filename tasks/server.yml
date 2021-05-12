@@ -6,16 +6,15 @@
     update_cache: yes
     cache_valid_time: 900
 
-- name: Install sudo, python3-pip, rsync
+- name: Install sudo, python3-pip
   apt:
     name: "{{ item }}"
     state: present
   loop:
     - sudo
     - python3-pip
-    - rsync
 
-- name: Install Docker and docker-compose SDK for Python
+- name: Install Docker SDK and docker-compose SDK for Python
   pip:
     name: "{{ item }}"
     state: present

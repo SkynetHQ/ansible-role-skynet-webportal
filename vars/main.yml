@@ -1,5 +1,2 @@
 ---
-# vars file for skynetlabs.skynet_webportal
-
-webportal_docker_data_dir: "{{ webportal_dir }}/docker/data"
-webportal_docker_data_mongo_dir: "{{ webportal_docker_data_dir }}/mongo"
+# Vars file for skynetlabs.skynet_webportal

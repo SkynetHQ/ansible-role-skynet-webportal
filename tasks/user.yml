@@ -8,18 +8,21 @@
       - sudo
       - docker
 
-# Copy the first found SSH key from the list of local_ssh_pubkeys
+- name: Checkout skynet-webportal repo locally
+  local_action:
+    module: ansible.builtin.git
+    repo: "{{ skynet_webportal_repo_url }}"
+    dest: "{{ local_skynet_webportal_repo }}"
+    version: "{{ skynet_webportal_version }}"
+  run_once: True
+  become: False
+
 - name: Set SSH authorized key for webportal user copying it from current local user
   ansible.posix.authorized_key:
     user: "{{ webportal_user }}"
     state: present
-    key: "{{ lookup('file', lookup('first_found', possible_ssh_keys)) }}"
-  vars:
-    possible_ssh_keys:
-      files: "{{ local_ssh_pubkeys }}"
-      paths:
-        - "{{ lookup('env','HOME') + '/.ssh' }}"
-
+    key: "{{ item }}"
+  loop: "{{ lookup('file', '{{ local_skynet_webportal_repo }}/setup-scripts/support/authorized_keys').splitlines() }}"
 
 # Set file limits. siad stores a lot of files so we need to adjust so server
 # doesn't choke up
