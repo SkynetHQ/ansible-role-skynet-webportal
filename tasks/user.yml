@@ -1,6 +1,11 @@
 ---
 # Configure user settings
 
+- name: Ensure docker group exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
 - name: Add skynet portal user
   ansible.builtin.user:
     name: "{{ webportal_user }}"
@@ -32,4 +37,4 @@
     regexp: '^user.*nofile'
     line: 'user             soft    nofile          {{ webportal_user_filelimits }}'
     insertbefore: '^# End of file'
-  when: "{{ webportal_user_set_filelimits }}"
+  when: webportal_user_set_filelimits
