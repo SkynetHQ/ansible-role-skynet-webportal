@@ -17,7 +17,7 @@
   run_once: True
   become: False
 
-- name: Set SSH authorized key for webportal user copying it from current local user
+- name: Add SSH keys from skynet-webportal repo to webportal user
   ansible.posix.authorized_key:
     user: "{{ webportal_user }}"
     state: present
@@ -32,3 +32,4 @@
     regexp: '^user.*nofile'
     line: 'user             soft    nofile          {{ webportal_user_filelimits }}'
     insertbefore: '^# End of file'
+  when: "{{ webportal_user_set_filelimits }}"

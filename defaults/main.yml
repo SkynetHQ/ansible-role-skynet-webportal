@@ -2,7 +2,7 @@
 # Defaults file for Ansible role skynetlabs.skynet_webportal
 
 # Timezone settings: Whether to set timezone and timezone value
-webportal_server_set_timezone: false
+webportal_server_set_timezone: False
 webportal_server_timezone: "UTC"
 
 # Webportal OS user
@@ -17,3 +17,7 @@ skynet_webportal_version: "deploy-2021-05-12"
 # Local git checkouts
 local_git_repos: "/tmp/SkynetLabs-ansible/git-repos"
 local_skynet_webportal_repo: "{{ local_git_repos }}/skynet-webportal"
+
+# Set Webportal user filelimits
+webportal_user_set_filelimits: True
+webportal_user_filelimits: 25000

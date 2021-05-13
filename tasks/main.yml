@@ -9,8 +9,8 @@
 
 - name: "Setup server: apt update, install packages, set timezone"
   ansible.builtin.import_tasks: server.yml
-  become: true
+  become: True
 
-- name: Set user, upload local SSH key, set user filelimits
+- name: "Setup user: Create user, upload local SSH key, set user filelimits"
   ansible.builtin.import_tasks: user.yml
-  become: true
+  become: True
