@@ -1,6 +1,8 @@
 ---
 # Tasks file for skynetlabs.skynet_webportal
 
+# Run as root or root like user
+
 - name: Check supported OS and version
   assert:
     that:
@@ -14,3 +16,15 @@
 - name: "Setup user: Create user, upload local SSH key, set user filelimits"
   ansible.builtin.import_tasks: user.yml
   become: True
+
+# Run as portal user
+
+- name: Set Ansible user to webportal user
+  set_fact:
+    ansible_user: "{{ webportal_user }}"
+
+- command: pwd
+  register: result
+
+- debug:
+    msg: "{{ result.stdout }}"
