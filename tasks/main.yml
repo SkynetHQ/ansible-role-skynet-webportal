@@ -1,7 +1,7 @@
 ---
 # Tasks file for skynetlabs.skynet_webportal
 
-# Run as root or root like user
+# Run as root or root like initial user
 
 - name: Check supported OS and version
   assert:
@@ -9,12 +9,12 @@
       - ansible_distribution|lower == 'debian' and ansible_distribution_version == '10'
     fail_msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not yet supported by this role"
 
-- name: "Setup server: apt update, install packages, set timezone"
-  ansible.builtin.import_tasks: server.yml
-  become: True
-
 - name: "Setup user: Create user, upload local SSH key, set user filelimits"
   ansible.builtin.import_tasks: user.yml
+  become: True
+
+- name: "Setup server: apt update, install packages, set timezone"
+  ansible.builtin.import_tasks: server.yml
   become: True
 
 # Run as portal user

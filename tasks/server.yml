@@ -1,6 +1,17 @@
 ---
 # Setup server
 
+- name: Set SSH config
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/ssh_config
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  loop:
+    - regex: "PasswordAuthentication"
+      line: "    PasswordAuthentication no"
+    - regex: "HashKnownHosts"
+      line: "    HashKnownHosts no"
+
 - name: Run "apt-get update"
   apt:
     update_cache: yes
