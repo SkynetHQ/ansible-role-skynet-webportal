@@ -7,3 +7,9 @@ webportal_user: "user"
 # Set file limits. siad stores a lot of files so we need to adjust so the
 # server doesn't choke up
 webportal_user_filelimits: 25000
+
+# Skynet Webportal git repository URL
+webportal_repo_url: "https://github.com/SkynetLabs/skynet-webportal.git"
+
+# Webportal directory
+webportal_dir: "/home/{{ webportal_user }}/skynet-webportal"
