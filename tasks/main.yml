@@ -1,41 +1,28 @@
 ---
 # tasks file for skynetlabs.skynet_webportal
 
+# Requirements:
+# - docker
+# - Docker and docker-compose SDK for Python (python3-pip)
+
 - name: Check supported OS and version
   assert:
     that:
       - ansible_distribution|lower == 'debian' and ansible_distribution_version == '10'
     fail_msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not yet supported by this role"
 
-- name: "Setup server: apt update, sudo, timezone"
-  ansible.builtin.import_tasks: server.yml
-  become: true
+- name: Run "apt-get update"
+  apt:
+    update_cache: yes
+    cache_valid_time: 900
+  become: True
 
-- name: Set user, upload local SSH key, set user filelimits
-  ansible.builtin.import_tasks: user.yml
-  become: true
-
-- name: Setup ufw firewall
-  include_tasks:
-    file: firewall.yml
-    apply:
-      become: true
-  when: webportal_server_set_firewall
-
-- name: Setup Skynet webportal
-  include_tasks:
-    file: webportal.yml
-    apply:
-      become: true
-
-- name: Setup MongoDB
-  include_tasks:
-    file: mongo.yml
-    apply:
-      become: true
-
-- name: Start Skynet webportal by docker compose
-  include_tasks:
-    file: docker-up.yml
-    apply:
-      become: true
+# Set file limits. siad stores a lot of files so we need to adjust so server
+# doesn't choke up
+- name: Set filelimits
+  ansible.builtin.lineinfile:
+    path: /etc/security/limits.conf
+    regexp: '^{{ webportal_user }}.*nofile'
+    line: '{{ webportal_user }}             soft    nofile          {{ webportal_user_filelimits }}'
+    insertbefore: '^# End of file'
+  become: True
