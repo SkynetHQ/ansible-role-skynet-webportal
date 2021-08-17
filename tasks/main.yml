@@ -28,16 +28,4 @@
     insertbefore: '^# End of file'
   become: True
 
-# Checkout webportal repo
-- name: Checkout webportal repo
-  ansible.builtin.git:
-    repo: "{{ webportal_repo_url }}"
-    dest: "{{ webportal_dir }}"
-
-# Config git
-- name: Config git
-  community.general.git_config:
-    name: "{{ item.name }}"
-    scope: global
-    value: "{{ item.value }}"
-  loop: "{{ webportal_git_config }}"
+# xxx update role from temp playbook task
