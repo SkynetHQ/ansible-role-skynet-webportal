@@ -9,7 +9,7 @@
 - name: Check supported OS and version
   assert:
     that:
-      - ansible_distribution|lower == 'debian' and ansible_distribution_version == '10'
+      - ansible_distribution|lower == 'debian' and (ansible_distribution_version == '10' or ansible_distribution_version == '11')
     fail_msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not yet supported by this role"
 
 - name: Run "apt-get update"
@@ -23,9 +23,8 @@
 - name: Set filelimits
   ansible.builtin.lineinfile:
     path: /etc/security/limits.conf
-    regexp: '^{{ webportal_user }}.*nofile'
-    line: '{{ webportal_user }}             soft    nofile          {{ webportal_user_filelimits }}'
-    insertbefore: '^# End of file'
+    regexp: "^{{ webportal_user }}.*nofile"
+    line: "{{ webportal_user }}             soft    nofile          {{ webportal_user_filelimits }}"
+    insertbefore: "^# End of file"
   become: True
-
 # xxx update role from temp playbook task
